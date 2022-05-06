@@ -1,5 +1,3 @@
-package Bowler;
-
 import com.neuronrobotics.bowlerstudio.creature.ICadGenerator;
 import com.neuronrobotics.bowlerstudio.creature.CreatureLab;
 import org.apache.commons.io.IOUtils;
@@ -12,206 +10,103 @@ import com.neuronrobotics.sdk.addons.kinematics.MobileBase
 import com.neuronrobotics.sdk.addons.kinematics.math.TransformNR
 
 import java.nio.file.Paths;
-
 import eu.mihosoft.vrl.v3d.CSG
+import eu.mihosoft.vrl.v3d.Cylinder
 import eu.mihosoft.vrl.v3d.FileUtil;
-import eu.mihosoft.vrl.v3d.Transform;
+import eu.mihosoft.vrl.v3d.RoundedCube
+import eu.mihosoft.vrl.v3d.Transform
+
+import com.neuronrobotics.bowlerstudio.vitamins.*;
 import javafx.scene.transform.Affine;
-import com.neuronrobotics.bowlerstudio.physics.TransformFactory;
-import com.neuronrobotics.bowlerstudio.scripting.ScriptingEngine
 println "Loading STL file"
 // Load an STL file from a git repo
 // Loading a local file also works here
+CSG reverseDHValues(CSG incoming,DHLink dh ){
+	println "Reversing "+dh
+	TransformNR step = new TransformNR(dh.DhStep(0))
+	Transform move = com.neuronrobotics.bowlerstudio.physics.TransformFactory.nrToCSG(step)
+	return incoming.transformed(move)
+}
+
+CSG moveDHValues(CSG incoming,DHLink dh ){
+	TransformNR step = new TransformNR(dh.DhStep(0)).inverse()
+	Transform move = com.neuronrobotics.bowlerstudio.physics.TransformFactory.nrToCSG(step)
+	return incoming.transformed(move)
+	
+}
 
 return new ICadGenerator(){
-	
-	private CSG moveDHValues(CSG incoming,DHLink dh ){
-		TransformNR step = new TransformNR(dh.DhStep(0)).inverse()
-		Transform move = TransformFactory.nrToCSG(step)
-		return incoming.transformed(move)
-		
-	}
-
-	@Override 
+	@Override
 	public ArrayList<CSG> generateCad(DHParameterKinematics d, int linkIndex) {
-		ArrayList<CSG> allCad=new ArrayList<>();
-		String limbName = d.getScriptingName()
-		File legFile = null
-		boolean mirror=true
-		if(limbName.contentEquals("DefaultLeg3")||limbName.contentEquals("DefaultLeg4")){
-			println "Mirror leg parts"
-			mirror=false
-		}
-		TransformNR  legRoot= d.getRobotToFiducialTransform()
-		def leftSide=false
-		def rear = true
-		if(legRoot.getY()>0){
-			leftSide=true;
-		}
-		if(legRoot.getX()>0){
-			rear=false;
-		}
-		
-		if(limbName.contentEquals("Tail")){
-			if(linkIndex >1)
-				return allCad;
-			if(linkIndex ==0){
-				legFile = ScriptingEngine.fileFromGit(
-				"https://github.com/OperationSmallKat/SmallKat_V2.git",
-				"STLs/MKTailandHeadMount.stl");
-	
-			}
-			if(linkIndex ==1){
-				legFile = ScriptingEngine.fileFromGit(
-				"https://github.com/OperationSmallKat/SmallKat_V2.git",
-				"STLs/MKTail.stl");
-			}
-	
-			
-		}else if(limbName.contentEquals("Head")){
-			if(linkIndex >1)
-				return allCad;
-			if(linkIndex ==0){
-				legFile = ScriptingEngine.fileFromGit(
-				"https://github.com/OperationSmallKat/SmallKat_V2.git",
-				"STLs/MKTailandHeadMount.stl");
-
-			}
-			if(linkIndex ==1){
-				legFile = ScriptingEngine.fileFromGit(
-				"https://github.com/OperationSmallKat/SmallKat_V2.git",
-				"STLs/MKHead.stl");
-			}
-	
-			if(linkIndex ==2)
-				return allCad;
-		}else{
-			if(leftSide){
-				if(linkIndex ==0){
-					legFile = ScriptingEngine.fileFromGit(
-					"https://github.com/OperationSmallKat/SmallKat_V2.git",
-					"STLs/MKCat Shoulder.stl");
-		
-				}
-				if(linkIndex ==1){
-					legFile = ScriptingEngine.fileFromGit(
-					"https://github.com/OperationSmallKat/SmallKat_V2.git",
-					"STLs/MKCat Leg Mirror.stl");
-		
-				}
-		
-				if(linkIndex ==2){
-					legFile = ScriptingEngine.fileFromGit(
-					"https://github.com/OperationSmallKat/SmallKat_V2.git",
-					"STLs/MKCat Foot.stl");
-				}
-			}
-			else{
-				if(linkIndex ==0){
-					legFile = ScriptingEngine.fileFromGit(
-					"https://github.com/OperationSmallKat/SmallKat_V2.git",
-					"STLs/MKCat Shoulder Mirror.stl");
-		
-				}
-				if(linkIndex ==1){
-					legFile = ScriptingEngine.fileFromGit(
-					"https://github.com/OperationSmallKat/SmallKat_V2.git",
-					"STLs/MKCat Leg.stl");
-		
-				}
-		
-				if(linkIndex ==2){
-					legFile = ScriptingEngine.fileFromGit(
-					"https://github.com/OperationSmallKat/SmallKat_V2.git",
-					"STLs/MKCat Foot Mirror.stl");
-		
-				}
-			}
-		}
-		
-
-
 		ArrayList<DHLink> dhLinks = d.getChain().getLinks()
+		ArrayList<CSG> allCad=new ArrayList<>()
+		int i=linkIndex;
 		DHLink dh = dhLinks.get(linkIndex)
 		// Hardware to engineering units configuration
-		LinkConfiguration conf = d.getLinkConfiguration(linkIndex);
+		LinkConfiguration conf = d.getLinkConfiguration(i);
 		// Engineering units to kinematics link (limits and hardware type abstraction)
-		AbstractLink abstractLink = d.getAbstractLink(linkIndex);// Transform used by the UI to render the location of the object
+		AbstractLink abstractLink = d.getAbstractLink(i);
 		// Transform used by the UI to render the location of the object
 		Affine manipulator = dh.getListener();
-
+		// loading the vitamins referenced in the configuration
+		CSG servo=   Vitamins.get(conf.getElectroMechanicalType(),conf.getElectroMechanicalSize())
 		
-		// Load the .CSG from the disk and cache it in memory
-		println "Loading " +legFile
-		CSG body  = Vitamins.get(legFile)
-		if(linkIndex ==0){
-			//body=moveDHValues(body,dh)
-
-			if(limbName.contentEquals("Head")||limbName.contentEquals("Tail")){
-				body=body
-				.rotz(90)
-				.rotx(180)
-				.movex(-41)
-				.movey(-21)
-				.movez(-22)
-					//.movez(-11.5)
-			}	else{
-				body=body.roty(180)
-				.rotx(180)
-				//if(rear)
-					//body=body.rotx(180)
-			}
-				
-		}
-		if(linkIndex ==1){
-			
-
-			if(limbName.contentEquals("Head")){
-				body=body
-				.roty(180)
-				.movex(50)
-					//.movey(-18)
-					//.movez(-38.5)
-			}else if(limbName.contentEquals("Tail")){
-				body=body
-				.roty(180)
-				.rotz(-90)
-				.movey(125)
-			}else{
-				body=body.roty(180)
-			}
-		}
-		if(linkIndex ==2){
-			body=body.roty(180)
-
-		}
+		CSG servoBox = new RoundedCube(servo.getTotalX()+4, servo.getTotalY()+4, servo.getTotalZ()+4).cornerRadius(2).toCSG()
+		servoBox = servoBox.difference(servo)
 		
-		body.setManipulator(manipulator);
-	
-		def parts = [body ] as ArrayList<CSG>
-		for(int i=0;i<parts.size();i++){
-			parts.get(i).setColor(javafx.scene.paint.Color.RED)
-		}
-		return parts;
+		CSG femur= new Cylinder(5,5).toCSG()
 		
+		CSG tmpFemur = moveDHValues(femur,dh)
+		CSG tmpSrv = moveDHValues(servo,dh)
+		CSG tmpServoBox = moveDHValues(servoBox,dh)
+		
+		CSG unionFemur = femur.union(tmpFemur).hull()
+
+		//Compute the location of the base of this limb to place objects at the root of the limb
+		TransformNR step = d.getRobotToFiducialTransform()
+		Transform locationOfBaseOfLimb = com.neuronrobotics.bowlerstudio.physics.TransformFactory.nrToCSG(step)
+		
+		//allCad.add(tmpSrv)
+		allCad.add(tmpServoBox)
+		allCad.add(unionFemur)
+		
+		for(CSG varbit:allCad)
+			varbit.setManipulator(manipulator)
+		
+		println "Generating link: "+linkIndex
+
+		if(i==0){
+			// more at https://github.com/NeuronRobotics/java-bowler/blob/development/src/main/java/com/neuronrobotics/sdk/addons/kinematics/DHLink.java
+			println dh
+			println "D = "+dh.getD()// this is the height of the link
+			println "R = "+dh.getR()// this is the radius of rotation of the link
+			println "Alpha = "+Math.toDegrees(dh.getAlpha())// this is the alpha rotation
+			println "Theta = "+Math.toDegrees(dh.getTheta())// this is the rotation about hte final like orentation
+			println conf // gets the link hardware map from https://github.com/NeuronRobotics/java-bowler/blob/development/src/main/java/com/neuronrobotics/sdk/addons/kinematics/LinkConfiguration.java
+			println conf.getHardwareIndex() // gets the link hardware index
+			println conf.getScale() // gets the link hardware scale to degrees from link units
+			// more from https://github.com/NeuronRobotics/java-bowler/blob/development/src/main/java/com/neuronrobotics/sdk/addons/kinematics/AbstractLink.java
+			println  "Max engineering units for link = " + abstractLink.getMaxEngineeringUnits()
+			println  "Min engineering units for link = " + abstractLink.getMinEngineeringUnits()
+			println "Position "+abstractLink.getCurrentEngineeringUnits()
+			println manipulator
+		}
+		return allCad;
 	}
-	@Override 
+	@Override
 	public ArrayList<CSG> generateBody(MobileBase b ) {
 		ArrayList<CSG> allCad=new ArrayList<>();
+		double size =40;
 
-		File mainBodyFile = ScriptingEngine.fileFromGit(
-			"https://github.com/OperationSmallKat/SmallKat_V2.git",
-			"STLs/MKBody.stl");
-
+		File servoFile = ScriptingEngine.fileFromGit(
+			"https://github.com/NeuronRobotics/NASACurisoity.git",
+			"STL/body.STL");
 		// Load the .CSG from the disk and cache it in memory
-		CSG body  = Vitamins.get(mainBodyFile)
+		CSG body  = Vitamins.get(servoFile)
 
 		body.setManipulator(b.getRootListener());
-		body.setColor(javafx.scene.paint.Color.WHITE)
-		def parts = [body ] as ArrayList<CSG>
-		for(int i=0;i<parts.size();i++){
-			parts.get(i).setColor(javafx.scene.paint.Color.GRAY)
-		}
-		return parts;
+		
+
+		return [body];
 	}
 };
