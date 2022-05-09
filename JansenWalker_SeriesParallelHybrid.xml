@@ -1,8 +1,8 @@
 <root>
 <mobilebase>
 	<cadEngine>
-		<git>https://github.com/JansenSmith/JansenWalker_SeriesParallelHybrid.git</git>
-		<file>Bowler/MediumCad.groovy</file>
+		<git>https://github.com/JansenSmith/JaThreeDPrintCad.groovybrid.git</git>
+		<file>ThreeDPrintCad.groovy</file>
 	</cadEngine>
 	<driveEngine>
 		<git>https://github.com/JansenSmith/JansenWalker_SeriesParallelHybrid.git</git>
@@ -21,8 +21,8 @@
 
 <parallelGroup>disneyLeg</parallelGroup>
 	<cadEngine>
-		<git>https://github.com/JansenSmith/JansenWalker_SeriesParallelHybrid.git</git>
-		<file>Bowler/MediumCad.groovy</file>
+		<git>https://github.com/JansenSmith/JaThreeDPrintCad.groovybrid.git</git>
+		<file>ThreeDPrintCad.groovy</file>
 	</cadEngine>
 	<kinematics>
 		<git>https://github.com/JansenSmith/JansenWalker_SeriesParallelHybrid.git</git>
@@ -406,8 +406,8 @@
 
 </parallelGroupTipOffset>
 	<cadEngine>
-		<git>https://github.com/JansenSmith/JansenWalker_SeriesParallelHybrid.git</git>
-		<file>Bowler/MediumCad.groovy</file>
+		<git>https://github.com/JansenSmith/JaThreeDPrintCad.groovybrid.git</git>
+		<file>ThreeDPrintCad.groovy</file>
 	</cadEngine>
 	<kinematics>
 		<git>https://github.com/JansenSmith/JansenWalker_SeriesParallelHybrid.git</git>
@@ -1239,12 +1239,6 @@
 	<rotw>1.0</rotw>
 	<rotx>-0.0</rotx>
 	<roty>-0.0</roty>
-	<rotz>-0.0</rotz></imuFromCentroid>
-
-<vitamins>
-
-</vitamins>
-
-</mobilebase>
+	<rotz>-0.0</rotz></imuFromCentroid>ThreeDPrintCad.groovy</mobilebase>
 
 </root>
