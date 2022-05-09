@@ -1,7 +1,7 @@
 <root>
 <mobilebase>
 	<cadEngine>
-		<git>https://github.com/JansenSmith/JaThreeDPrintCad.groovybrid.git</git>
+		<git>https://github.com/JansenSmith/JansenWalker_SeriesParallelHybrid.git</git>
 		<file>ThreeDPrintCad.groovy</file>
 	</cadEngine>
 	<driveEngine>
@@ -21,7 +21,7 @@
 
 <parallelGroup>disneyLeg</parallelGroup>
 	<cadEngine>
-		<git>https://github.com/JansenSmith/JaThreeDPrintCad.groovybrid.git</git>
+		<git>hhttps://github.com/JansenSmith/JansenWalker_SeriesParallelHybrid.git</git>
 		<file>ThreeDPrintCad.groovy</file>
 	</cadEngine>
 	<kinematics>
@@ -406,7 +406,7 @@
 
 </parallelGroupTipOffset>
 	<cadEngine>
-		<git>https://github.com/JansenSmith/JaThreeDPrintCad.groovybrid.git</git>
+		<git>https://github.com/JansenSmith/JansenWalker_SeriesParallelHybrid.git</git>
 		<file>ThreeDPrintCad.groovy</file>
 	</cadEngine>
 	<kinematics>
