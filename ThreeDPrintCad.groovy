@@ -10,10 +10,10 @@ import com.neuronrobotics.sdk.addons.kinematics.MobileBase
 import com.neuronrobotics.sdk.addons.kinematics.math.TransformNR
 
 import java.nio.file.Paths;
-
 import eu.mihosoft.vrl.v3d.CSG
 import eu.mihosoft.vrl.v3d.Cylinder
 import eu.mihosoft.vrl.v3d.FileUtil;
+import eu.mihosoft.vrl.v3d.RoundedCube
 import eu.mihosoft.vrl.v3d.Transform
 
 import com.neuronrobotics.bowlerstudio.vitamins.*;
@@ -50,10 +50,16 @@ return new ICadGenerator(){
 		Affine manipulator = dh.getListener();
 		// loading the vitamins referenced in the configuration
 		CSG servo=   Vitamins.get(conf.getElectroMechanicalType(),conf.getElectroMechanicalSize())
+		
+		CSG servoBox = new RoundedCube(servo.getTotalX()+4, servo.getTotalY()+4, servo.getTotalZ()+2).cornerRadius(2).toCSG()
+		servoBox = servoBox.movex(2).movey(2)
+		servoBox = servoBox.difference(servo)
+		
 		CSG femur= new Cylinder(5,5).toCSG()
 		
 		CSG tmpFemur = moveDHValues(femur,dh)
 		CSG tmpSrv = moveDHValues(servo,dh)
+		CSG tmpServoBox = moveDHValues(servoBox,dh)
 		
 		CSG unionFemur = femur.union(tmpFemur).hull()
 
@@ -62,6 +68,7 @@ return new ICadGenerator(){
 		Transform locationOfBaseOfLimb = com.neuronrobotics.bowlerstudio.physics.TransformFactory.nrToCSG(step)
 		
 		//allCad.add(tmpSrv)
+		allCad.add(tmpServoBox)
 		allCad.add(unionFemur)
 		
 		for(CSG varbit:allCad)
