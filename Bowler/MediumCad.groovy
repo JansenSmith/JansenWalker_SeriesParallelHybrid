@@ -51,7 +51,8 @@ return new ICadGenerator(){
 		// loading the vitamins referenced in the configuration
 		CSG servo=   Vitamins.get(conf.getElectroMechanicalType(),conf.getElectroMechanicalSize())
 		
-		CSG servoBox = new RoundedCube(servo.getTotalX()+4, servo.getTotalY()+4, servo.getTotalZ()+4).cornerRadius(2).toCSG()
+		CSG servoBox = new RoundedCube(servo.getTotalX()+4, servo.getTotalY()+4, servo.getTotalZ()+2).cornerRadius(2).toCSG()
+		servoBox = servoBox.movex(2).movey(2)
 		servoBox = servoBox.difference(servo)
 		
 		CSG femur= new Cylinder(5,5).toCSG()
