@@ -51,8 +51,17 @@ return new ICadGenerator(){
 		// loading the vitamins referenced in the configuration
 		CSG servo=   Vitamins.get(conf.getElectroMechanicalType(),conf.getElectroMechanicalSize())
 		
-		CSG servoBox = new RoundedCube(servo.getTotalX()+4, servo.getTotalY()+4, servo.getTotalZ()+2).cornerRadius(2).toCSG()
-		servoBox = servoBox.movex(2).movey(2)
+		float servoBox_thickness = 2 //in mm
+		CSG servoBox = new RoundedCube(servo.getTotalX()+servoBox_thickness*2, 
+						servo.getTotalY()+servoBox_thickness*2, 
+						servo.getMaxZ())
+						.cornerRadius(2).toCSG()
+		servoBox = servoBox
+					.toXMin()
+					.toYMin()
+					.toZMax()
+					.movex(-servoBox_thickness)
+					.movey(-servoBox_thickness)
 		servoBox = servoBox.difference(servo)
 		
 		CSG femur= new Cylinder(5,5).toCSG()
@@ -68,6 +77,7 @@ return new ICadGenerator(){
 		Transform locationOfBaseOfLimb = com.neuronrobotics.bowlerstudio.physics.TransformFactory.nrToCSG(step)
 		
 		//allCad.add(tmpSrv)
+		allCad.add(tmpSrv)
 		allCad.add(tmpServoBox)
 		allCad.add(unionFemur)
 		
@@ -92,22 +102,12 @@ return new ICadGenerator(){
 			println "Position "+abstractLink.getCurrentEngineeringUnits()
 			println manipulator
 		}
+		tmpSrv = tmpSrv.setColor(javafx.scene.paint.Color.BISQUE)
 		return allCad;
 	}
 	@Override
 	public ArrayList<CSG> generateBody(MobileBase b ) {
-		ArrayList<CSG> allCad=new ArrayList<>();
-		double size =40;
 
-		File servoFile = ScriptingEngine.fileFromGit(
-			"https://github.com/NeuronRobotics/NASACurisoity.git",
-			"STL/body.STL");
-		// Load the .CSG from the disk and cache it in memory
-		CSG body  = Vitamins.get(servoFile)
-
-		body.setManipulator(b.getRootListener());
-		
-
-		return [body];
+		return null;
 	}
 };
