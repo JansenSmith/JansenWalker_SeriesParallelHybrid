@@ -36,6 +36,8 @@ CSG moveDHValues(CSG incoming,DHLink dh ){
 }
 
 return new ICadGenerator(){
+	MobileBase saved_base = null;
+	
 	@Override
 	public ArrayList<CSG> generateCad(DHParameterKinematics d, int linkIndex) {
 		ArrayList<DHLink> dhLinks = d.getChain().getLinks()
@@ -107,7 +109,7 @@ return new ICadGenerator(){
 	}
 	@Override
 	public ArrayList<CSG> generateBody(MobileBase b ) {
-
+		saved_base = b;
 		return null;
 	}
 };
